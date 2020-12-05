@@ -22,12 +22,8 @@ import java.util.regex.Pattern
 
 class KotlinScrabbleImperative(val scrabbleBase: ScrabbleBase) {
 
-    fun counts(word: String): Map<Char, Int> = mutableMapOf<Char, Int>().also { counts ->
-        word.forEach { counts[it] = counts[it]?.plus(1) ?: 1 }
-    }
-
     private fun nBlanks(word: String): Int {
-        val counts = word.counts() //counts(word)
+        val counts = word.counts()
         return counts.entries.sumBy { entry: Map.Entry<Char, Int> ->
                     Integer.max(
                             0, entry.value - scrabbleAvailableLetters[entry.key - 'A']
@@ -36,7 +32,7 @@ class KotlinScrabbleImperative(val scrabbleBase: ScrabbleBase) {
     }
 
     private fun score2(word: String): Int {
-        val counts = word.counts() //counts(word)
+        val counts = word.counts()
         return counts.entries
                 .sumBy { entry: Map.Entry<Char, Int> ->
                     letterScores[entry.key - 'A'] *
@@ -56,8 +52,16 @@ class KotlinScrabbleImperative(val scrabbleBase: ScrabbleBase) {
 
     private fun bonusForDoubleLetter(word: String): Int {
         var max = 0
-        listOf(word.take(3), word.takeLast(3)).forEach { chars ->
-            chars.forEach { char ->
+        val length = word.length
+        if (length > 6) {
+            max = max.coerceAtLeast(letterScores[word[0] - 'A'])
+            max = max.coerceAtLeast(letterScores[word[1] - 'A'])
+            max = max.coerceAtLeast(letterScores[word[2] - 'A'])
+            max = max.coerceAtLeast(letterScores[word[length - 3] - 'A'])
+            max = max.coerceAtLeast(letterScores[word[length - 2] - 'A'])
+            max = max.coerceAtLeast(letterScores[word[length - 1] - 'A'])
+        } else {
+            word.forEach { char ->
                 max = max.coerceAtLeast(letterScores[char - 'A'])
             }
         }

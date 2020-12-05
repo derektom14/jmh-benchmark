@@ -52,7 +52,7 @@ class KotlinScrabbleFunctional(val scrabbleBase: ScrabbleBase) {
     }
 
     private fun bonusForDoubleLetter(word: String): Int {
-        return (word.take(3) + word.takeLast(3))
+        return (if (word.length > 6) word.take(3) + word.takeLast(3) else word)
                 .map { letter: Char -> letterScores[letter - 'A'] }
                 .max() ?: 0
     }
