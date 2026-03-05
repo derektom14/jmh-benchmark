@@ -1,6 +1,7 @@
-package com.derek.benchmark.scrabble
+package com.derek.benchmark.range
 
 import org.openjdk.jmh.annotations.*
+import org.openjdk.jmh.infra.Blackhole
 import org.openjdk.jmh.runner.Runner
 import org.openjdk.jmh.runner.RunnerException
 import org.openjdk.jmh.runner.options.OptionsBuilder
@@ -15,17 +16,19 @@ http://hg.openjdk.java.net/code-tools/jmh/file/tip/jmh-samples/src/main/java/org
 @Fork(value = 2, jvmArgs = ["-Xms2G", "-Xmx2G"])
 @Warmup(iterations = 3)
 @Measurement(iterations = 20)
-open class ScrabbleBenchmark {
-    private val scrabbleBase = readScrabbleBaseFrom("/shakespeare.txt", "/scrabble.txt")
-
+open class RangeBenchmark {
     @Benchmark
-    fun kotlinScrabbleFunctional(): List<Map.Entry<Int, List<String>>> {
-        return KotlinScrabbleFunctional(scrabbleBase).run()
+    fun rangeForEach(blackhole: Blackhole) {
+        (0 until 1_000_000).forEach {
+            blackhole.consume(it)
+        }
     }
 
     @Benchmark
-    fun kotlinScrabbleImperative(): List<Map.Entry<Int, List<String>>> {
-        return KotlinScrabbleImperative(scrabbleBase).run()
+    fun rangeForLoop(blackhole: Blackhole) {
+        for (i in 0 until 1_000_000) {
+            blackhole.consume(i)
+        }
     }
 
     companion object {
@@ -33,7 +36,7 @@ open class ScrabbleBenchmark {
         @JvmStatic
         fun main(args: Array<String>) {
             val opt = OptionsBuilder()
-                .include(ScrabbleBenchmark::class.java.getSimpleName())
+                .include(RangeBenchmark::class.java.getSimpleName())
                 .forks(1)
                 .build()
 

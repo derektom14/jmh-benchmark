@@ -3,7 +3,7 @@ package com.derek.benchmark.scrabble
 import org.apache.commons.io.IOUtils
 import java.nio.charset.StandardCharsets
 
-data class ScrabbleBase(
+class ScrabbleBase(
     val availableWords: Array<String>,
     val scrabbleWords: Set<String>
 )
