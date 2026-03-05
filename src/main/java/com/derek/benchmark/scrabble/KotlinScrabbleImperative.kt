@@ -24,23 +24,21 @@ class KotlinScrabbleImperative(val scrabbleBase: ScrabbleBase) {
 
     private fun nBlanks(word: String): Int {
         val counts = word.counts()
-        return counts.entries.sumBy { entry: Map.Entry<Char, Int> ->
-                    Integer.max(
-                            0, entry.value - scrabbleAvailableLetters[entry.key - 'A']
-                    )
-                }
+        return counts.entries.sumOf { entry: Map.Entry<Char, Int> ->
+            (entry.value - scrabbleAvailableLetters[entry.key - 'A']).coerceAtLeast(0)
+        }
     }
 
     private fun score2(word: String): Int {
         val counts = word.counts()
         return counts.entries
-                .sumBy { entry: Map.Entry<Char, Int> ->
-                    letterScores[entry.key - 'A'] *
-                            Integer.min(
-                                    entry.value,
-                                    scrabbleAvailableLetters[entry.key - 'A']
-                            )
-                }
+            .sumOf { entry: Map.Entry<Char, Int> ->
+                letterScores[entry.key - 'A'] *
+                        Integer.min(
+                            entry.value,
+                            scrabbleAvailableLetters[entry.key - 'A']
+                        )
+            }
     }
 
 
@@ -72,7 +70,7 @@ class KotlinScrabbleImperative(val scrabbleBase: ScrabbleBase) {
         val histogram = TreeMap<Int, MutableList<String>>(Comparator.reverseOrder())
 
         scrabbleBase.availableWords.forEach { lowerCaseWord ->
-            val word = lowerCaseWord.toUpperCase()
+            val word = lowerCaseWord.uppercase()
             if (isAlphabetical(word) && scrabbleBase.scrabbleWords.contains(word) && nBlanks(word) <= 2) {
                 val score = score(word)
                 histogram.getOrPut(score) { ArrayList() }.add(word)

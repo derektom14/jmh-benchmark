@@ -24,24 +24,22 @@ class KotlinScrabbleFunctional(val scrabbleBase: ScrabbleBase) {
 
     private fun nBlanks(word: String): Int {
         return word.groupingBy { it }.eachCount()
-                .entries
-                .sumBy { entry: Map.Entry<Char, Int> ->
-                    Integer.max(
-                            0, entry.value - scrabbleAvailableLetters[entry.key - 'A']
-                    )
-                }
+            .entries
+            .sumOf { entry: Map.Entry<Char, Int> ->
+                (entry.value - scrabbleAvailableLetters[entry.key - 'A']).coerceAtLeast(0)
+            }
     }
 
     private fun score2(word: String): Int {
         return word.groupingBy { it }.eachCount()
-                .entries
-                .sumBy { entry: Map.Entry<Char, Int> ->
-                    letterScores[entry.key - 'A'] *
-                            Integer.min(
-                                    entry.value,
-                                    scrabbleAvailableLetters[entry.key - 'A']
-                            )
-                }
+            .entries
+            .sumOf { entry: Map.Entry<Char, Int> ->
+                letterScores[entry.key - 'A'] *
+                        Integer.min(
+                            entry.value,
+                            scrabbleAvailableLetters[entry.key - 'A']
+                        )
+            }
     }
 
 
@@ -54,7 +52,7 @@ class KotlinScrabbleFunctional(val scrabbleBase: ScrabbleBase) {
     private fun bonusForDoubleLetter(word: String): Int {
         return (if (word.length > 6) word.take(3) + word.takeLast(3) else word)
                 .map { letter: Char -> letterScores[letter - 'A'] }
-                .max() ?: 0
+                .maxOrNull() ?: 0
     }
 
     private inline fun buildHistoOnScore(score: (String) -> Int): TreeMap<Int, MutableList<String>> {
@@ -94,7 +92,7 @@ class KotlinScrabbleFunctional(val scrabbleBase: ScrabbleBase) {
 
         private fun shakespeareWordStream(): Sequence<String> {
             return scrabbleBase.availableWords.asSequence()
-                    .map { obj: String -> obj.toUpperCase() }
+                    .map { obj: String -> obj.uppercase() }
                     .filter { word: String -> isAlphabetical(word) }
         }
 
